@@ -45,23 +45,19 @@ class App extends React.Component {
     }
   }
 
-  render() {
-    let table;
-    if (this.state.table === "topRecent") {
-      table = <Table
-                data={this.state.topRecent}
-                table="topRecent"
-              />;
+  evaluateData() {
+    if (this.state.table === 'topRecent') {
+      return this.state.topRecent;
     } else {
-      table = <Table
-                data={this.state.topAllTime}
-                table="topAllTime"
-              />
+      return this.state.topAllTime;
     }
+  }
+
+  render() {
     return (
       <div className="wrapper">
         <button onClick={this.toggleTable.bind(this)}>{this.state.table}</button>
-        {table}
+        <Table data={this.evaluateData()} table={this.state.table}/>
       </div>
     )
   }
