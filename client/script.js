@@ -16,7 +16,7 @@ class App extends React.Component {
       request.onload = () => {
         if (request.status >= 200 && request.status < 400) {
           let response = request.responseText;
-          resolve(response);
+          resolve(JSON.parse(response));
         } else {
           reject('There was an error');
         }
@@ -41,8 +41,20 @@ class App extends React.Component {
   render() {
     return (
       <div className="wrapper">
-        test
+        <TopRecentTable data={this.state.topRecent} />
       </div>
+    )
+  }
+}
+
+class TopRecentTable extends React.Component {
+  render() {
+    return(
+      <ul>
+        {this.props.data.map( (item, index) => {
+          return <li key={index}>{index}</li>;
+        })}
+      </ul>
     )
   }
 }
