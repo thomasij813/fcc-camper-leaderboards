@@ -66,38 +66,30 @@ class App extends React.Component {
 class Table extends React.Component {
   render() {
     return(
-      <table>
+      <table className="table table-hover table-sm">
         <thead>
-          <tr>
-            <th>Username</th>
-            <th>Img</th>
-            <th>All Time Points</th>
-            <th>Recent Points</th>
-            <th>Last Update</th>
+          <tr >
+            <th>#</th>
+            <th>Camper</th>
+            <th className="text-center">Total Points</th>
+            <th className="text-center">Recent Points (last 30 days)</th>
           </tr>
         </thead>
         <tbody>
           {this.props.data.map( (item, index) => {
             return (
               <tr key={index}>
-                <td>{item.username}</td>
-                <td>{item.img}</td>
-                <td>{item.alltime}</td>
-                <td>{item.recent}</td>
-                <td>{item.lastUpdate}</td>
+                <th scope="row">{index + 1}</th>
+                <td>
+                  <img src={item.img} className="user_image"/> <a href={`http://www.freecodecamp.com/${item.username}`}>{item.username}</a>
+                  </td>
+                <td className="text-center">{item.alltime}</td>
+                <td className="text-center">{item.recent}</td>
               </tr>
             );
           })}
         </tbody>
       </table>
-      // <div className="test">
-      //   <p>{this.props.table}</p>
-      //     <ul>
-      //       {this.props.data.map( (item, index) => {
-      //         return <li key={index}>{item.username}</li>;
-      //       })}
-      //     </ul>
-      // </div>
     )
   }
 }
