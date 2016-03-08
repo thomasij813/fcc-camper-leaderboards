@@ -66,14 +66,38 @@ class App extends React.Component {
 class Table extends React.Component {
   render() {
     return(
-      <div>
-        <p>{this.props.table}</p>
-          <ul>
-            {this.props.data.map( (item, index) => {
-              return <li key={index}>{item.username}</li>;
-            })}
-          </ul>
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Img</th>
+            <th>All Time Points</th>
+            <th>Recent Points</th>
+            <th>Last Update</th>
+          </tr>
+        </thead>
+        <tbody>
+          {this.props.data.map( (item, index) => {
+            return (
+              <tr key={index}>
+                <td>{item.username}</td>
+                <td>{item.img}</td>
+                <td>{item.alltime}</td>
+                <td>{item.recent}</td>
+                <td>{item.lastUpdate}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      // <div className="test">
+      //   <p>{this.props.table}</p>
+      //     <ul>
+      //       {this.props.data.map( (item, index) => {
+      //         return <li key={index}>{item.username}</li>;
+      //       })}
+      //     </ul>
+      // </div>
     )
   }
 }
