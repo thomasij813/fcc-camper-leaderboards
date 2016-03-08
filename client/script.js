@@ -3,6 +3,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      table: 'topRecent',
       topRecent: [],
       topAllTime: []
     };
@@ -27,34 +28,56 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    // Get top recent
     this.getData('http://fcctop100.herokuapp.com/api/fccusers/top/recent')
       .then( (data) => { this.setState({ topRecent: data}); },
              (error) => { console.error(error); });
 
-    // Get top all top app time
     this.getData('http://fcctop100.herokuapp.com/api/fccusers/top/alltime')
       .then( (data) => { this.setState({ topAllTime: data}); },
              (error) => { console.error(error); });
   }
 
+  toggleTable() {
+    if (this.state.table === 'topRecent') {
+      this.setState({ table: 'topAllTime'});
+    } else {
+      this.setState({ table: 'topRecent'});
+    }
+  }
+
   render() {
+    let table;
+    if (this.state.table === "topRecent") {
+      table = <Table
+                data={this.state.topRecent}
+                table="topRecent"
+              />;
+    } else {
+      table = <Table
+                data={this.state.topAllTime}
+                table="topAllTime"
+              />
+    }
     return (
       <div className="wrapper">
-        <TopRecentTable data={this.state.topRecent} />
+        <button onClick={this.toggleTable.bind(this)}>{this.state.table}</button>
+        {table}
       </div>
     )
   }
 }
 
-class TopRecentTable extends React.Component {
+class Table extends React.Component {
   render() {
     return(
-      <ul>
-        {this.props.data.map( (item, index) => {
-          return <li key={index}>{index}</li>;
-        })}
-      </ul>
+      <div>
+        <p>{this.props.table}</p>
+          <ul>
+            {this.props.data.map( (item, index) => {
+              return <li key={index}>{item.username}</li>;
+            })}
+          </ul>
+      </div>
     )
   }
 }
