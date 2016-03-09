@@ -4,6 +4,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       table: 'topRecent',
+      ascending: true,
       topRecent: [],
       topAllTime: []
     };
@@ -39,15 +40,44 @@ class App extends React.Component {
 
   evaluateData() {
     if (this.state.table === 'topRecent') {
-      return this.state.topRecent;
+      if (this.state.ascending) {
+        return this.state.topRecent;
+      } else {
+        let reverse = this.state.topRecent.slice().reverse();
+        return reverse;
+      }
+
     } else {
-      return this.state.topAllTime;
+      if (this.state.ascending) {
+        return this.state.topAllTime;
+      } else {
+        let reverse = this.state.topAllTime.slice().reverse();
+        return reverse;
+      }
     }
+  }
+
+  evaluateSortArrow(table) {
+    if (this.state.table === table) {
+      if (this.state.ascending) {
+        return <span className="glyphicon glyphicon-triangle-top" onClick={this.toggleSort.bind(this)}></span>;
+      } else {
+        return <span className="glyphicon glyphicon-triangle-bottom" onClick={this.toggleSort.bind(this)}></span>;
+      }
+    }
+  }
+
+  toggleSort() {
+    let sort = this.state.ascending;
+    this.setState({ ascending: !sort });
   }
 
   setTable(e) {
     let table = e.target.dataset.table;
-    this.setState({ table: table });
+    this.setState({
+      table: table,
+      ascending: true
+    });
   }
 
   render() {
@@ -56,13 +86,14 @@ class App extends React.Component {
           <table className="table table-hover table-sm">
             <thead>
               <tr >
-                <th>#</th>
                 <th>Camper</th>
                 <th className="text-center">
                   <a href="#" onClick={this.setTable.bind(this)} data-table="topAllTime">Total Points</a>
+                  {this.evaluateSortArrow('topAllTime')}
                 </th>
                 <th className="text-center">
                   <a href="#" onClick={this.setTable.bind(this)} data-table="topRecent">Recent Points (last 30 days)</a>
+                  {this.evaluateSortArrow('topRecent')}
                 </th>
               </tr>
             </thead>
@@ -80,7 +111,6 @@ class TableBody extends React.Component {
         {this.props.data.map( (item, index) => {
           return (
             <tr key={index}>
-              <th scope="row">{index + 1}</th>
               <td>
                 <img src={item.img} className="user_image"/> <a href={`http://www.freecodecamp.com/${item.username}`}>{item.username}</a>
                 </td>
