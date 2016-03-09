@@ -37,14 +37,6 @@ class App extends React.Component {
              (error) => { console.error(error); });
   }
 
-  toggleTable() {
-    if (this.state.table === 'topRecent') {
-      this.setState({ table: 'topAllTime'});
-    } else {
-      this.setState({ table: 'topRecent'});
-    }
-  }
-
   evaluateData() {
     if (this.state.table === 'topRecent') {
       return this.state.topRecent;
@@ -53,43 +45,51 @@ class App extends React.Component {
     }
   }
 
+  setTable(e) {
+    let table = e.target.dataset.table;
+    this.setState({ table: table });
+  }
+
   render() {
     return (
       <div className="wrapper">
-        <button onClick={this.toggleTable.bind(this)}>{this.state.table}</button>
-        <Table data={this.evaluateData()} table={this.state.table}/>
+          <table className="table table-hover table-sm">
+            <thead>
+              <tr >
+                <th>#</th>
+                <th>Camper</th>
+                <th className="text-center">
+                  <a href="#" onClick={this.setTable.bind(this)} data-table="topAllTime">Total Points</a>
+                </th>
+                <th className="text-center">
+                  <a href="#" onClick={this.setTable.bind(this)} data-table="topRecent">Recent Points (last 30 days)</a>
+                </th>
+              </tr>
+            </thead>
+            <TableBody data={this.evaluateData()} />
+          </table>
       </div>
     )
   }
 }
 
-class Table extends React.Component {
+class TableBody extends React.Component {
   render() {
     return(
-      <table className="table table-hover table-sm">
-        <thead>
-          <tr >
-            <th>#</th>
-            <th>Camper</th>
-            <th className="text-center">Total Points</th>
-            <th className="text-center">Recent Points (last 30 days)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {this.props.data.map( (item, index) => {
-            return (
-              <tr key={index}>
-                <th scope="row">{index + 1}</th>
-                <td>
-                  <img src={item.img} className="user_image"/> <a href={`http://www.freecodecamp.com/${item.username}`}>{item.username}</a>
-                  </td>
-                <td className="text-center">{item.alltime}</td>
-                <td className="text-center">{item.recent}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <tbody>
+        {this.props.data.map( (item, index) => {
+          return (
+            <tr key={index}>
+              <th scope="row">{index + 1}</th>
+              <td>
+                <img src={item.img} className="user_image"/> <a href={`http://www.freecodecamp.com/${item.username}`}>{item.username}</a>
+                </td>
+              <td className="text-center">{item.alltime}</td>
+              <td className="text-center">{item.recent}</td>
+            </tr>
+          );
+        })}
+      </tbody>
     )
   }
 }
