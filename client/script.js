@@ -32,6 +32,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       loading: true,
+      error: false,
       table: '',
       data: [],
       ascending: true
@@ -54,16 +55,24 @@ class App extends React.Component {
       };
       this.setState({
         loading: false,
+        error: false,
         table: STORE.topRecent.table,
         data: STORE.topRecent.data
+      });
+    }.bind(this)).catch(function(error) {
+      this.setState({
+        error: true
       });
     }.bind(this));
   }
 
   onTableSelect(tableObj) {
+    let data = tableObj.data.sort(function(a, b) {
+      return a.rank - b.rank;
+    });
     this.setState({
       table: tableObj.table,
-      data: tableObj.data
+      data: data
     });
   }
 
@@ -88,40 +97,40 @@ class App extends React.Component {
   }
 
   render() {
-    if (this.state.loading) {
-      return <div>Loading</div>;
-    } else {
-      return (
-        <div className="container">
-          <h1 className="text-center">Free Code Camp Camper Leaderboards</h1>
-          <TableSelectorButtonGroup onTableSelect={this.onTableSelect.bind(this)} currentTable={this.state.table}/>
-          <table className="table table-hover table-sm">
-            <thead>
-              <tr >
-                <ColumnHeader classNameProp="" headerTitle="Rank" handleSort={this.onSort.bind(this)} sortValue="rank"/>
-                <ColumnHeader classNameProp="" headerTitle="Camper" handleSort={this.onSort.bind(this)} sortValue="username"/>
-                <ColumnHeader classNameProp="text-center" headerTitle="Total Points" handleSort={this.onSort.bind(this)} sortValue="alltime"/>
-                <ColumnHeader classNameProp="text-center" headerTitle="Recent Points (last 30 days)" handleSort={this.onSort.bind(this)} sortValue="recent"/>
-              </tr>
-            </thead>
-            <TableBody data={this.state.data} />
-          </table>
-        </div>
-      )
-    }
+    return (
+      <div className="container">
+        <h1 className="text-center">Free Code Camp Camper Leaderboards</h1>
+        {(function(){
+          if (this.state.loading && !this.state.error) {
+            return <LoadingScreen/>
+          } else if (!this.state.loading && this.state.error) {
+            return <ErrorScreen />
+          } else {
+            return(
+              <div>
+                <TableSelectorButtonGroup onTableSelect={this.onTableSelect.bind(this)} currentTable={this.state.table}/>
+                <table className="table table-hover table-sm">
+                  <TableHead onSort={this.onSort.bind(this)} />
+                  <TableBody data={this.state.data} />
+                </table>
+              </div>
+            )
+          }
+        }).bind(this)()}
+      </div>
+    )
   }
 }
 
-class ColumnHeader extends React.Component {
-  handleSort() {
-    this.props.handleSort(this.props.sortValue);
-  }
+class LoadingScreen extends React.Component {
   render() {
-    return(
-      <th className={this.props.classNameProp}>
-        <a href="#" onClick={this.handleSort.bind(this)}>{this.props.headerTitle}</a>
-      </th>
-    );
+    return <h3 className="text-center">Fetching data...</h3>
+  }
+}
+
+class ErrorScreen extends React.Component {
+  render() {
+    return <h3 className="text-center">There was an error getting the data. Please wait a few minutes and try again.</h3>
   }
 }
 
@@ -149,21 +158,43 @@ class TableSelectorButton extends React.Component {
     this.props.handleTableSelect(this.props.tableObj);
   }
   evaluateClassName() {
-    if (this.props.tableObj.table === this.props.currentTable) {
-      return 'btn btn-primary';
-    } else {
-      return 'btn btn-default';
-    }
+    return this.props.tableObj.table === this.props.currentTable ?
+      'btn btn-primary' :
+      'btn btn-default';
   }
   render() {
     return (
-      <a
-        type="button"
-        onClick={this.handleClick.bind(this)}
-        className={this.evaluateClassName()}
-      >
+      <a type="button" onClick={this.handleClick.bind(this)} className={this.evaluateClassName()}>
          {this.props.tableObj.table}
       </a>
+    );
+  }
+}
+
+class TableHead extends React.Component {
+  render() {
+    return(
+      <thead>
+        <tr >
+          <ColumnHeader classNameProp="" handleSort={this.props.onSort} sortValue="rank">Rank</ColumnHeader>
+          <ColumnHeader classNameProp="" handleSort={this.props.onSort} sortValue="username">Camper</ColumnHeader>
+          <ColumnHeader classNameProp="text-center" handleSort={this.props.onSort} sortValue="alltime">Total Points</ColumnHeader>
+          <ColumnHeader classNameProp="text-center" handleSort={this.props.onSort} sortValue="recent">Recent Points (last 30 days)</ColumnHeader>
+        </tr>
+      </thead>
+    )
+  }
+}
+
+class ColumnHeader extends React.Component {
+  handleSort() {
+    this.props.handleSort(this.props.sortValue);
+  }
+  render() {
+    return(
+      <th className={this.props.classNameProp}>
+        <a href="#" onClick={this.handleSort.bind(this)}>{this.props.children}</a>
+      </th>
     );
   }
 }
