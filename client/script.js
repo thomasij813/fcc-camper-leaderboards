@@ -34,8 +34,7 @@ class App extends React.Component {
       loading: true,
       error: false,
       table: '',
-      data: [],
-      ascending: true
+      data: []
     };
   }
 
