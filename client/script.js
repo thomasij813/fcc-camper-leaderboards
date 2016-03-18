@@ -28,8 +28,8 @@ function getData(url) {
 
 class App extends React.Component {
 
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.state = {
       loading: true,
       error: false,
@@ -83,7 +83,7 @@ class App extends React.Component {
       });
     } else if (sortValue === 'username') {
       sortedData = this.state.data.sort(function(a, b){
-          if(a[sortValue].toLowerCase() < b[sortValue].toLowerCase()) return -1;
+          if(a[sortValue].toLowerCase() < b[sortValue].toLowerCase()) return - 1;
           if(a[sortValue].toLowerCase() > b[sortValue].toLowerCase()) return 1;
           return 0;
       });
@@ -96,26 +96,54 @@ class App extends React.Component {
   }
 
   render() {
+    if (this.state.loading && !this.state.error) {
+      return (
+        <MainWrapper>
+          <LoadingScreen />
+        </MainWrapper>
+      )
+    } else if (!this.state.loading && this.state.error) {
+      return (
+        <MainWrapper>
+          <ErrorScreen />
+        </MainWrapper>
+      )
+    } else {
+      return (
+        <MainWrapper>
+          <Table
+            onTableSelect={this.onTableSelect.bind(this)}
+            onSort={this.onSort.bind(this)}
+            currentTable={this.state.table}
+            data={this.state.data}/>
+        </MainWrapper>
+      )
+    }
+  }
+}
+
+class MainWrapper extends React.Component {
+  render() {
     return (
       <div className="container">
         <h1 className="text-center">Free Code Camp Camper Leaderboards</h1>
-        {(function(){
-          if (this.state.loading && !this.state.error) {
-            return <LoadingScreen/>
-          } else if (!this.state.loading && this.state.error) {
-            return <ErrorScreen />
-          } else {
-            return(
-              <div>
-                <TableSelectorButtonGroup onTableSelect={this.onTableSelect.bind(this)} currentTable={this.state.table}/>
-                <table className="table table-hover table-sm">
-                  <TableHead onSort={this.onSort.bind(this)} />
-                  <TableBody data={this.state.data} />
-                </table>
-              </div>
-            )
-          }
-        }).bind(this)()}
+        {this.props.children}
+      </div>
+    )
+  }
+}
+
+class Table extends React.Component {
+  render() {
+    return (
+      <div>
+        <TableSelectorButtonGroup
+          onTableSelect={this.props.onTableSelect}
+          currentTable={this.props.table}/>
+        <table className="table table-hover table-sm">
+          <TableHead onSort={this.props.onSort} />
+          <TableBody data={this.props.data} />
+        </table>
       </div>
     )
   }
